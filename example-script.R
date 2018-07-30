@@ -1,38 +1,25 @@
-library(tidyverse)
 library(lubridate)
 library(r2stl)
-
-avocado <- read_csv(file.path ("input", "avocado.csv")) %>%
-  filter(region %in% c("NewYork")) %>%
-  filter(type == "organic") %>%
-
- mutate(yday = yday(Date))
-  
-avocado %>%
-ggplot() +
-  geom_line(mapping = aes(x = yday, y = AveragePrice)) +
-facet_wrap(~year)  
-
-x <- avocado$yday
-
-y <- avocado$AveragePrice
-
-
-
-# Let's do the classic persp() demo plot
-x <- seq(-10, 10, length= 100)
-y <- x
-f <- function(x,y) { r <- sqrt(x^2+y^2); 10 * sin(r)/r }
-z <- outer(x, y, f)
-z[is.na(z)] <- 1
-r2stl(x, y, z, filename="lovelyfunction.stl", show.persp=TRUE)
-
-z <- volcano
-x <- 1:dim(volcano)[1]
-y <- 1:dim(volcano)[2]
-r2stl(x, y, z, filename="volcano.stl", show.persp=TRUE)
-
 library(tidyverse)
-library(lubridate)
-library(r2stl)
+
+# Read in data
+avocado <- read_csv(file.path("input","avocado.csv"))
+
+# Clean up spaces in variable names
+names(avocado) <- str_replace_all(names(avocado)," ","")
+
+# plot data
+ustotal <- avocado %>%
+  filter(region == "TotalUS",
+         type == "organic",
+         year %in% c("2015","2016","2017")) %>%
+  mutate(yearday = yday(Date))
+
+
+x <- ustotal$year %>% factor() %>% levels() %>% as.numeric()
+y <- ustotal$yearday %>% factor () %>% levels () %>% as.numeric ()
+
+z <- matrix(data = ustotal$AveragePrice, nrow = 3, ncol = 157)
+
+r2stl(x, y, z, filename="ustotalaverageprice.stl", show.persp =TRUE)
 
